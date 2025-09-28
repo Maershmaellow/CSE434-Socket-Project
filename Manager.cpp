@@ -52,7 +52,7 @@ class Manager {
 
 int main(int argc, char* argv[]) {
 
-    int port_num = stoi(string(argv[2]));
+    int port_num = atoi(argv[1]);
 
     if(argc != 2) {
         cout << "Incorrect usage of command line arguments\n";
