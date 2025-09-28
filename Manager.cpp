@@ -51,11 +51,19 @@ class Manager {
 };
 
 int main(int argc, char* argv[]) {
-    int listener_port;
-    cout << "Enter port for Manager to listen to: " << '\n';
-    cin >> listener_port;
+
+    int port_num = stoi(string(argv[2]));
+
+    if(argc != 2) {
+        cout << "Incorrect usage of command line arguments\n";
+        return -1;
+    } else if(port_num < 1730 || port_num > 2229) {
+        cout << "port number must be in range [1730, 2229]\n";
+        return -1;
+    }
 
     while(1) {
-        //listen to port
+        cout << "worked\n";
+        break;
     }
 }
