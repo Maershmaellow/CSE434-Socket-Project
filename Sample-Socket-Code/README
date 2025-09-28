@@ -1,0 +1,22 @@
+This directory/folder contains three files.  The first two,
+
+1. UDPEchoClient.c
+2. UDPEchoServer.c
+
+were demo'd in class on Thursday, 01/27/2022.  You may want to check out the video for the lecture
+that day.  Test that you can compile and run the server and client on different machines and on the
+same machine.
+
+The third file is:
+
+3. defns.h
+
+It contains the definition of a simple structure.  I suggest you try to modify the client and 
+server to:
+(a) Each of the client and server #include this "defns.h" file.
+(b) Have the client initialize the structure, and pass it to the server using sendto(), writing a number of bytes equal to the sizeof( struct Name-of-Struct ).
+(c) Have the server read the structure from the socket using recvfrom(), print the fields in the
+    structure and then modify the structure in some way, e.g., increment the integers.  Send the
+    modified structure back to the client using sendto().
+(d) Have the client read the structure from the socket using recvfrom(), print the fields in the
+    modified structure; iterates ITERATIONS times.
