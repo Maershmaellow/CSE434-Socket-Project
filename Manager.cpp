@@ -14,44 +14,47 @@ class DSS_Protocol {
     public:
         DSS_Protocol(){}
         int parse_input(string input) {
-        stringstream in_stream(input);
-        vector<string> delimited;
-        string temp;
+            stringstream in_stream(input);
+            vector<string> delimited;
+            string temp;
 
-        cout << "Delimiting\n";
-        while(in_stream >> temp) {
-            delimited.push_back(temp);
-        }
-        cout << "Delimited without errors\n";
+            cout << "Delimiting\n";
+            while(in_stream >> temp) {
+                delimited.push_back(temp);
+            }
+            cout << "Delimited without errors\n";
 
-        // switch case doesnt work in c++ for strings or char* ;(
-        if(delimited[0] == "register-disk" && delimited.size() == 5) {
-            return register_disk(delimited[1], delimited[2], stoi(delimited[3]), stoi(delimited[4]));
-        } else if(delimited[0] == "register-user" && delimited.size() == 5) {
-            return register_user(delimited[1], delimited[2], stoi(delimited[3]), stoi(delimited[4]));
-        } else if(delimited[0] == "configure-dss" && delimited.size() == 4) {
-            return config_dss(delimited[1], stoi(delimited[2]), delimited[3]);
-        } else if(delimited[0] == "ls" && delimited.size() == 1) {
-            return list();
-        } else if(delimited[0] == "copy" && delimited.size() == 4) {
-            return copy(delimited[1], stoi(delimited[2]), delimited[3]);
-        } else if(delimited[0] == "read" && delimited.size() == 4) {
-            return read(delimited[1], delimited[2], delimited[3]);
-        } else if(delimited[0] == "disk-failure" && delimited.size() == 2) {
-            return disk_failure(delimited[1]);
-        } else if(delimited[0] == "deregister-disk" && delimited.size() == 2) {
-            return deregister_disk(delimited[1]);
-        } else if(delimited[0] == "deregister-user" && delimited.size() == 2) {
-            return deregister_user(delimited[1]);
-        } else if(delimited[0] == "deregister-disk" && delimited.size() == 2) {
-            return decommission_dss(delimited[1]);
-        } else {
+            // switch case doesnt work in c++ for strings or char* ;(
+            // delimit user input by spaces, then redirect to the appropriate function according to the typed command  
+            if(delimited[0] == "register-disk" && delimited.size() == 5) {
+                return register_disk(delimited[1], delimited[2], stoi(delimited[3]), stoi(delimited[4]));
+            } else if(delimited[0] == "register-user" && delimited.size() == 5) {
+                return register_user(delimited[1], delimited[2], stoi(delimited[3]), stoi(delimited[4]));
+            } else if(delimited[0] == "configure-dss" && delimited.size() == 4) {
+                return config_dss(delimited[1], stoi(delimited[2]), delimited[3]);
+            } else if(delimited[0] == "ls" && delimited.size() == 1) {
+                return list();
+            } else if(delimited[0] == "copy" && delimited.size() == 4) {
+                return copy(delimited[1], stoi(delimited[2]), delimited[3]);
+            } else if(delimited[0] == "read" && delimited.size() == 4) {
+                return read(delimited[1], delimited[2], delimited[3]);
+            } else if(delimited[0] == "disk-failure" && delimited.size() == 2) {
+                return disk_failure(delimited[1]);
+            } else if(delimited[0] == "deregister-disk" && delimited.size() == 2) {
+                return deregister_disk(delimited[1]);
+            } else if(delimited[0] == "deregister-user" && delimited.size() == 2) {
+                return deregister_user(delimited[1]);
+            } else if(delimited[0] == "deregister-disk" && delimited.size() == 2) {
+                return decommission_dss(delimited[1]);
+            } else {
+                cout << "Please type a valid command\n";
+                return FAILURE;
+            }
+
             return FAILURE;
         }
 
-        return 0;
-        }
-
+        // Protocol functions according to the expected behavior listed in the project description
         int register_disk(string disk_name, string IPv4_addr, int m_port, int c_port) {
             cout << "Registering Disk: " << disk_name << "\nIPv4 Address: " << IPv4_addr << "\nManagement Port: " << m_port << "\nCommunication Port: " << c_port << "\n";
 
