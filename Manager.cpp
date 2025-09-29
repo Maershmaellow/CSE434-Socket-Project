@@ -1,5 +1,7 @@
-#include "util.h";
 #include <vector>
+#include <sys/socket.h> // for socket(), connect(), sendto(), and recvfrom()
+#include <arpa/inet.h>  // for sockaddr_in and inet_addr()
+#include "util.h"
 
 using namespace std;
 
@@ -51,11 +53,19 @@ class Manager {
 };
 
 int main(int argc, char* argv[]) {
-    int listener_port;
-    cout << "Enter port for Manager to listen to: " << '\n';
-    cin >> listener_port;
+
+    int port_num = atoi(argv[1]);
+
+    if(argc != 2) {
+        cout << "Incorrect usage of command line arguments\n";
+        return -1;
+    } else if(port_num < 1730 || port_num > 2229) {
+        cout << "port number must be in range [1730, 2229]\n";
+        return -1;
+    }
 
     while(1) {
-        //listen to port
+        cout << "worked v1.2\n";
+        break;
     }
 }
