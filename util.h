@@ -1,6 +1,10 @@
 #include <string>
 #include <iostream>
+#include <sys/socket.h> // for socket(), connect(), sendto(), and recvfrom()
+#include <arpa/inet.h>  // for sockaddr_in and inet_addr()
+#include <cstring>
 
+#define MSGMAX 255
 
 enum Return_Code {
     FAILURE = -1,
@@ -12,9 +16,17 @@ enum State {
 };
 
 // Cannot make a vector<type_struct> without a temporary value to put into the vector, for this reason Disk is a class not a struct
-class Disk {
+class Client {
     public:
-        std::string disk_name;
+        std::string name;
+        std::string IP;
+        unsigned short m_port;
+        unsigned short c_port;
         State state;
 };
 
+void DieWithError( const char *errorMessage ) // External error handling function
+{
+    perror( errorMessage );
+    exit( 1 );
+}
