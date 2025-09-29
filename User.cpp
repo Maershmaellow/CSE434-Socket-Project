@@ -3,6 +3,12 @@
 
 using namespace std;
 
+void DieWithError( const char *errorMessage ) // External error handling function
+{
+    perror( errorMessage );
+    exit( 1 );
+}
+
 int main(int argc, char* argv[]) {
     if(argc != 6) {
         cout << "incorrect number of command line parameters\n";
