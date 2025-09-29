@@ -1,6 +1,13 @@
-#include "util.h"
+#include "DSS_Protocol.h"
 
 using namespace std;
+
+void DieWithError( const char *errorMessage ) // External error handling function
+{
+    perror( errorMessage );
+    exit( 1 );
+}
+
 
 int main(int argc, char* argv[]) {
     int sock;                           // Socket
@@ -46,10 +53,15 @@ int main(int argc, char* argv[]) {
 
         recBuffer[ recvMsgSize ] = '\0';
 
-        printf( "server: received string ``%s'' from client on IP address %s\n", recBuffer, inet_ntoa( clntAddr.sin_addr ) );
+        // Display command and process it
+        printf( "Manager: received command ``%s'' from client on IP address %s\n", recBuffer, inet_ntoa( clntAddr.sin_addr ) );
+        int success = parse_input(recBuffer);
 
         // Send received datagram back to the client
-        if( sendto( sock, recBuffer, strlen( recBuffer ), 0, (struct sockaddr *) &clntAddr, sizeof( clntAddr ) ) != strlen( recBuffer ) )
+        if( sendto( sock, to_string(success).c_str(), strlen( to_string(success).c_str() ), 0, (struct sockaddr *) &clntAddr, sizeof( clntAddr ) ) != strlen( to_string(success).c_str() ) )
+        {
             DieWithError( "server: sendto() sent a different number of bytes than expected" );
+        }    
+        cout << "\n\n";
     }
 }

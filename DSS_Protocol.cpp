@@ -1,8 +1,4 @@
-#include "util.h"
-#include <vector>
-#include <sstream>
-
-using namespace std;
+#include "DSS_Protocol.h"
 
 int parse_input(string input) {
     stringstream in_stream(input);
@@ -35,6 +31,8 @@ int parse_input(string input) {
         deregister_user(delimited[1]);
     } else if(delimited[0] == "deregister-disk" && delimited.size() == 2) {
         decommission_dss(delimited[1]);
+    } else {
+        return FAILURE;
     }
 
     return 0;

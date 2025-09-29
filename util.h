@@ -25,8 +25,3 @@ class Client {
         State state;
 };
 
-void DieWithError( const char *errorMessage ) // External error handling function
-{
-    perror( errorMessage );
-    exit( 1 );
-}

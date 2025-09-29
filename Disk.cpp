@@ -3,6 +3,13 @@
 
 using namespace std;
 
+void DieWithError( const char *errorMessage ) // External error handling function
+{
+    perror( errorMessage );
+    exit( 1 );
+}
+
+
 int main(int argc, char* argv[]) {
     if(argc != 6) {
         cout << "incorrect number of command line parameters\n";
@@ -45,7 +52,7 @@ int main(int argc, char* argv[]) {
         }
         else
             DieWithError( "client: error reading string to echo\n" );
-        
+
         
         // Send the string to the server
         if( sendto( sock, msgString, strlen( msgString ), 0, (struct sockaddr *) &managerAddr, sizeof( managerAddr ) ) != strlen(msgString) )
@@ -63,6 +70,7 @@ int main(int argc, char* argv[]) {
             DieWithError( "client: Error: received a packet from unknown source.\n" );
 
  		printf( "client: received string ``%s'' from server on IP address %s\n", msgString, inet_ntoa( fromAddr.sin_addr ) );
+        cout << "\n";
     }
     
     close( sock );
