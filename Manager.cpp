@@ -1,71 +1,55 @@
-#include <vector>
-#include <sys/socket.h> // for socket(), connect(), sendto(), and recvfrom()
-#include <arpa/inet.h>  // for sockaddr_in and inet_addr()
 #include "util.h"
 
 using namespace std;
 
-class Manager {
-    private:
-        vector<Disk> dss;
-
-    public:
-        int register_disk(string disk_name, string IPv4_addr, int m_port, int c_port) {
-
-        }
-
-        int register_user(string disk_name, string IPv4_addr, int m_port, int c_port) {
-            
-        }
-
-        int config_dss(string dss_name, int n, int striping_unit) {
-
-        }
-
-        int list() {
-
-        }
-
-        int copy(string file_name, int file_size, string owner) {
-
-        }
-
-        int read(string dss_name, string file_name, string user_name) {
-
-        }
-
-        int disk_failure(string dss_name) {
-
-        }
-
-        int deregister_user(string user_name) {
-
-        }
-
-        int deregister_disk(string disk_name) {
-
-        }
-
-        int decommission_dss(string dss_name) {
-
-        }
-                
-};
-
 int main(int argc, char* argv[]) {
+    int sock;                           // Socket
+    struct sockaddr_in servAddr;    // Local address of server
+    struct sockaddr_in clntAddr;    // Client address
+    unsigned int cliAddrLen;            // Length of incoming message
+    char recBuffer[ MSGMAX ];            // Buffer for echo string
+    unsigned short servPort;            // Server port
+    int recvMsgSize;                    // Size of received message
 
-    int port_num = atoi(argv[1]);
+    servPort = atoi(argv[1]);
 
     if(argc != 2) {
         cout << "Incorrect usage of command line arguments\n";
         return -1;
-    } else if(port_num < 1730 || port_num > 2229) {
+    } else if(servPort < 1730 || servPort > 2229) {
         cout << "port number must be in range [1730, 2229]\n";
         return -1;
     }
 
-    while(1) {
-        cout << "worked v1.2\n";
-        break;
+    if( ( sock = socket( PF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {
+        DieWithError( "server: socket() failed" );
+    }
+
+    memset( &servAddr, 0, sizeof( servAddr ) ); // Zero out structure
+    servAddr.sin_family = AF_INET;                  // Internet address family
+    servAddr.sin_addr.s_addr = htonl( INADDR_ANY ); // Any incoming interface
+    servAddr.sin_port = htons( servPort );      // Local port
+
+    if( bind( sock, (struct sockaddr *) &servAddr, sizeof(servAddr)) < 0 ) {
+        DieWithError( "server: bind() failed" );
+    }
+
+	printf( "server: Port server is listening to is: %d\n", servPort );
+
+    for(;;) // Run forever
+    {
+        cliAddrLen = sizeof( clntAddr );
+
+        // Block until receive message from a client
+        if( ( recvMsgSize = recvfrom( sock, recBuffer, MSGMAX, 0, (struct sockaddr *) &clntAddr, &cliAddrLen )) < 0 )
+            DieWithError( "server: recvfrom() failed" );
+
+        recBuffer[ recvMsgSize ] = '\0';
+
+        printf( "server: received string ``%s'' from client on IP address %s\n", recBuffer, inet_ntoa( clntAddr.sin_addr ) );
+
+        // Send received datagram back to the client
+        if( sendto( sock, recBuffer, strlen( recBuffer ), 0, (struct sockaddr *) &clntAddr, sizeof( clntAddr ) ) != strlen( recBuffer ) )
+            DieWithError( "server: sendto() sent a different number of bytes than expected" );
     }
 }
