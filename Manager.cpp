@@ -11,6 +11,8 @@ class DSS_Protocol {
         vector<DSS*> dss_v;
         vector<Client*> user_v;
         vector<Client*> disk_v;
+
+        int socket;
     public:
         DSS_Protocol(){}
         int parse_input(string input) {
@@ -98,7 +100,7 @@ class DSS_Protocol {
         }
 
         int config_dss(string dss_name, int n, string striping_unit) {
-            int stripe_size;
+            unsigned int stripe_size;
             cout << "Configuring: " << dss_name << "\nNum Disks: " << n << "\nStriping Unit: " << striping_unit << "\n";
             if(striping_unit.find("M") > 0 ) {
                 stripe_size = stoi(striping_unit) * 1000000;         // convert from MB to millions of bytes
@@ -120,6 +122,7 @@ class DSS_Protocol {
                 return FAILURE;
             }
 
+
             int numFree = 0;
             for(Client* curr : disk_v) {
                 if(numFree >= n) {
@@ -137,7 +140,7 @@ class DSS_Protocol {
 
             // DSS meets minimum requirements to be created
             vector<Client*> tempDisk_v;
-            DSS* newDSS = new DSS(dss_name);
+            DSS* newDSS = new DSS(dss_name, n, stripe_size);
 
             int good_choice = 0;
             while(good_choice < n) {
@@ -158,8 +161,62 @@ class DSS_Protocol {
             return 1;
         }
 
+
+        // for stripe (i), copy PARITY BLOCK into disk (n − ((i mod n) + 1))
+        // num STRIPES = (f/((n-1)*b))
         int copy(string file_name, int file_size, string owner) {
             cout << "Copying: " << file_name << "\nFrom owner: " << owner << "\nFilesize: " << file_size << "\n";
+            
+            // no DSS to copy to
+            if(dss_v.size() == 0) {
+                cout << "no DSS configured\n";
+                return FAILURE;
+            }
+
+            // DSS list + selection
+            cout << "listing all configured DSSs\n";
+            for(DSS* curr : dss_v) {
+                cout << "DSS:\t" << curr->name << "\t" << curr->n << "\t" << curr->striping_unit << "\n";
+                for(Client* dss_disk : curr->disks) {
+                    cout << "\t" << dss_disk->name << "\t" << dss_disk->IP << "\t" << dss_disk->c_port << "\n";
+                }
+            }
+            string selected;
+            DSS* selected_dss;
+            cout << "select DSS:\n";
+            cin >> selected;
+            for(DSS* curr : dss_v) {
+                if(selected == curr->name) {
+                    selected_dss = curr;
+                    cout << "dss selected -> " << selected << "\n";
+                    break;
+                }
+            }
+
+            //Display selected DSS
+            cout << "you selected: " << selected_dss->name << "\n";
+            cout << selected_dss->name << "\t" << selected_dss->n << "\t" << selected_dss->striping_unit << "\n";
+            for(Client* dss_disk : selected_dss->disks) {
+                cout << "\t" << dss_disk->name << "\t" << dss_disk->IP << "\t" << dss_disk->c_port << "\n";
+            }
+
+            // find owner
+            Client* owner_client;
+            for(Client* curr : user_v) {
+                if(curr->name == owner) {
+                    owner_client = curr;
+                    break;
+                }
+            }
+
+            if( sendto( socket, to_string(success).c_str(), strlen( to_string(success).c_str() ), 0, (struct sockaddr *) &clntAddr, sizeof( clntAddr ) ) != strlen( to_string(success).c_str() ) )
+            {
+                DieWithError( "server: sendto() sent a different number of bytes than expected" );
+            }    
+            cout << "\n\n";
+                
+            //unsigned int striping unit = 
+
             return 1;
         }
 
@@ -218,6 +275,10 @@ class DSS_Protocol {
             }
             return 1;
         }
+
+        void set_sock(int sock) {
+            this->socket = sock;
+        }
 };
 
 void DieWithError( const char *errorMessage ) // External error handling function
@@ -251,6 +312,7 @@ int main(int argc, char* argv[]) {
     }
 
     if( ( sock = socket( PF_INET, SOCK_DGRAM, IPPROTO_UDP ) ) < 0 ) {
+        protocol->set_sock(sock);
         DieWithError( "server: socket() failed" );
     }
 

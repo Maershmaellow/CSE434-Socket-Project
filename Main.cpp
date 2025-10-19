@@ -1,13 +1,8 @@
 #include <iostream>
+#include "DSS_Protocol.cpp"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    char* input;
-    cout << "type a string" << '\n';
-    cin >> input;
-    cout << "String: " << *input << " is " << sizeof(*input)/sizeof(char) << " characters long";
-
-
-    cout << "\nv1.0\n"; 
+    int success = parse_input("d1 xxx.xxxx.xxxx 13123 123132");
 }

@@ -45,8 +45,13 @@ class DSS {
     public:
         std::vector<Client*> disks;
         std::string name;
-        DSS(std::string name) {
+        int n;
+        unsigned int striping_unit;
+        
+        DSS(std::string name, int n, unsigned int striping_unit) {
             this->name = name;
+            this->n = n;
+            this->striping_unit = striping_unit;
         }
         void addDisks(std::vector<Client*> disks) {
             this->disks = disks;
